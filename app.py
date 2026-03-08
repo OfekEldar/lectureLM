@@ -679,7 +679,7 @@ body{{background:#07090f;font-family:{font_fam};color:#dce3f0;height:100vh;displ
 </div>
 
 <script>
-const S={slides_json};
+const S={{slides_json}};
 const TTS_LANG="{tts_lang}";
 const BTN_N="{btn_narrate}", BTN_S="{btn_stop}";
 let i=0,speaking=false,synth=window.speechSynthesis;

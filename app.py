@@ -617,28 +617,28 @@ def lecture_player_html(slides: list, unit_title: str) -> str:
 *{{box-sizing:border-box;margin:0;padding:0}}
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Source+Sans+3:wght@400;500;600&family=Heebo:wght@400;500;600;700&display=swap');
 body{{background:#07090f;font-family:{font_fam};color:#dce3f0;height:100vh;display:flex;flex-direction:column;overflow:hidden;padding:14px;gap:10px;direction:{dir_attr}}}
-.hdr{{display:flex;justify-content:space-between;align-items:center}}
 .hdr-title{{font-size:12px;color:#7a87a3;text-transform:uppercase;letter-spacing:.08em}}
 .counter{{font-size:12px;color:#d4a853;font-family:monospace;background:rgba(212,168,83,.1);padding:3px 11px;border-radius:20px;border:1px solid rgba(212,168,83,.25)}}
 .pbar{{width:100%;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}}
 .pfill{{height:100%;background:linear-gradient(90deg,#d4a853,#f0c878);border-radius:2px;transition:width .35s ease}}
-.slide{{flex:1;background:#0d1120;border:1px solid rgba(212,168,83,.14);border-radius:12px;padding:28px 36px;overflow-y:auto;position:relative;min-height:0}}
+.slide{{flex:1;background:#0d1120;border:1px solid rgba(212,168,83,.14);border-radius:12px;padding:28px 36px;overflow-y:auto;position:relative;min-height:0;direction:{dir_attr};text-align:{'right' if rtl else 'left'}}}
 .type-badge{{position:absolute;top:14px;{badge_side};font-size:10px;padding:3px 10px;border-radius:12px;background:rgba(212,168,83,.1);color:#d4a853;border:1px solid rgba(212,168,83,.22);text-transform:uppercase;letter-spacing:.09em;font-weight:700}}
-.stitle{{font-family:{font_fam};font-size:24px;font-weight:700;color:#f0c878;margin-bottom:18px;line-height:1.3;{title_pad}}}
+.stitle{{font-family:{font_fam};font-size:24px;font-weight:700;color:#f0c878;margin-bottom:18px;line-height:1.3;{title_pad};direction:{dir_attr};text-align:{'right' if rtl else 'left'}}}
 .stitle.center{{text-align:center;font-size:30px;padding:0;margin-top:16px}}
-.subtitle{{text-align:center;color:#7a87a3;font-size:15px;margin-top:8px;font-style:italic}}
+.subtitle{{text-align:center;color:#7a87a3;font-size:15px;margin-top:8px;font-style:italic;direction:{dir_attr}}}
 .bigicon{{text-align:center;font-size:44px;margin-bottom:8px}}
-.bullets{{display:flex;flex-direction:column;gap:8px}}
-.bullet{{display:flex;gap:10px;align-items:flex-start;padding:9px 13px;background:rgba(255,255,255,.03);border-radius:7px;{bb_side};font-size:14.5px;line-height:1.55;color:#c8d0e0;opacity:0;transform:{anim_start};animation:fi .35s ease forwards}}
+.bullets{{display:flex;flex-direction:column;gap:8px;direction:{dir_attr}}}
+.bullet{{display:flex;flex-direction:{'row-reverse' if rtl else 'row'};gap:10px;align-items:flex-start;padding:9px 13px;background:rgba(255,255,255,.03);border-radius:7px;{bb_side};font-size:14.5px;line-height:1.55;color:#c8d0e0;opacity:0;transform:{anim_start};animation:fi .35s ease forwards;text-align:{'right' if rtl else 'left'};direction:{dir_attr}}}
 .bicon{{color:#d4a853;font-size:13px;margin-top:2px;flex-shrink:0}}
-.formula{{background:rgba(79,126,245,.08);border:1px solid rgba(79,126,245,.25);border-radius:9px;padding:14px 20px;margin-top:14px;font-family:'Courier New',monospace;font-size:15px;color:#a8c8f8;text-align:center;line-height:1.7;white-space:pre-wrap}}
+.formula{{background:rgba(79,126,245,.08);border:1px solid rgba(79,126,245,.25);border-radius:9px;padding:14px 20px;margin-top:14px;font-family:'Courier New',monospace;font-size:15px;color:#a8c8f8;text-align:center;line-height:1.7;white-space:pre-wrap;direction:ltr}}
 @keyframes fi{{to{{opacity:1;transform:translateX(0)}}}}
-.narrator{{background:#0d1120;border:1px solid rgba(212,168,83,.14);border-radius:9px;padding:12px 16px;display:flex;gap:11px;align-items:flex-start}}
+.narrator{{background:#0d1120;border:1px solid rgba(212,168,83,.14);border-radius:9px;padding:12px 16px;display:flex;flex-direction:{'row-reverse' if rtl else 'row'};gap:11px;align-items:flex-start}}
 .avi{{width:36px;height:36px;background:linear-gradient(135deg,#d4a853,#a87830);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 2px 10px rgba(212,168,83,.25)}}
 .avi.sp{{animation:pulse 1.4s ease-in-out infinite}}
 @keyframes pulse{{0%,100%{{box-shadow:0 2px 10px rgba(212,168,83,.25)}}50%{{box-shadow:0 2px 20px rgba(212,168,83,.6)}}}}
-.nar-label{{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#d4a853;font-weight:700;margin-bottom:3px}}
-.nar-text{{font-size:13px;color:#7a87a3;line-height:1.6;font-style:italic}}
+.nar-label{{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#d4a853;font-weight:700;margin-bottom:3px;text-align:{'right' if rtl else 'left'}}}
+.nar-text{{font-size:13px;color:#7a87a3;line-height:1.6;font-style:italic;direction:{dir_attr};text-align:{'right' if rtl else 'left'}}}
+.hdr{{display:flex;justify-content:space-between;align-items:center;direction:{dir_attr}}}
 .ctrls{{display:flex;align-items:center;gap:10px}}
 .btn{{padding:9px 18px;border-radius:7px;border:none;cursor:pointer;font-family:{font_fam};font-size:13.5px;font-weight:600;transition:all .18s ease;white-space:nowrap}}
 .btn-p{{background:linear-gradient(135deg,#d4a853,#a87830);color:#07090f}}
@@ -682,6 +682,7 @@ body{{background:#07090f;font-family:{font_fam};color:#dce3f0;height:100vh;displ
 const S={{slides_json}};
 const TTS_LANG="{tts_lang}";
 const BTN_N="{btn_narrate}", BTN_S="{btn_stop}";
+const DIR="{dir_attr}";
 let i=0,speaking=false,synth=window.speechSynthesis;
 
 function dots(){{
@@ -700,20 +701,20 @@ function render(){{
   const c=document.getElementById('slide');
   let h='';
   if(sl.type==='title'){{
-    h=`<div style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%;gap:14px;">
+    h=`<div dir="${{DIR}}" style="display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%;gap:14px;">
       <div class="bigicon">🎓</div>
-      <h1 class="stitle center">${{sl.title}}</h1>
-      <div class="subtitle">${{(sl.bullets||[]).join(' · ')}}</div>
+      <h1 class="stitle center" dir="${{DIR}}">${{sl.title}}</h1>
+      <div class="subtitle" dir="${{DIR}}">${{(sl.bullets||[]).join(' · ')}}</div>
     </div>`;
   }}else{{
     h=`<span class="type-badge">${{sl.type||'concept'}}</span>`;
-    h+=`<h2 class="stitle">${{sl.title}}</h2>`;
+    h+=`<h2 class="stitle" dir="${{DIR}}">${{sl.title}}</h2>`;
     if(sl.bullets&&sl.bullets.length){{
-      h+='<div class="bullets">';
-      sl.bullets.forEach((b,k)=>{{h+=`<div class="bullet" style="animation-delay:${{k*.09}}s"><span class="bicon">▸</span><span>${{b}}</span></div>`;}});
+      h+=`<div class="bullets" dir="${{DIR}}">`;
+      sl.bullets.forEach((b,k)=>{{h+=`<div class="bullet" dir="${{DIR}}" style="animation-delay:${{k*.09}}s"><span class="bicon">▸</span><span>${{b}}</span></div>`;}});
       h+='</div>';
     }}
-    if(sl.formula)h+=`<div class="formula">${{sl.formula}}</div>`;
+    if(sl.formula)h+=`<div class="formula" dir="ltr">${{sl.formula}}</div>`;
   }}
   c.innerHTML=h; dots();
 }}

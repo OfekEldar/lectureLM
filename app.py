@@ -230,6 +230,12 @@ TRANSLATIONS = {
         'pdf_key_concepts': 'Key Concepts', 'pdf_key_formulas': 'Key Formulas & Theorems',
         'pdf_important': 'Important Points', 'pdf_connections': 'Connections to the Course',
         'pdf_takeaway': 'Key Takeaway',
+        'save_course': 'Save Course', 'load_course': 'Load Course',
+        'save_desc': 'Download your progress as a file',
+        'load_desc': 'Resume a previously saved course',
+        'load_success': '✅ Course loaded successfully!',
+        'load_error': '❌ Invalid save file.',
+        'save_load_title': '💾 Save / Load',
         'tts_lang': 'en-US',
         'not_started_lbl': 'Not started',
     },
@@ -290,6 +296,12 @@ TRANSLATIONS = {
         'pdf_key_concepts': 'מושגי מפתח', 'pdf_key_formulas': 'נוסחאות ומשפטים',
         'pdf_important': 'נקודות חשובות', 'pdf_connections': 'קישורים לקורס',
         'pdf_takeaway': 'המסקנה המרכזית',
+        'save_course': 'שמור קורס', 'load_course': 'טען קורס',
+        'save_desc': 'הורד את ההתקדמות שלך כקובץ',
+        'load_desc': 'המשך קורס שנשמר קודם',
+        'load_success': '✅ הקורס נטען בהצלחה!',
+        'load_error': '❌ קובץ שמירה לא תקין.',
+        'save_load_title': '💾 שמור / טען',
         'tts_lang': 'he-IL',
         'not_started_lbl': 'לא התחיל',
     }
@@ -311,6 +323,48 @@ def lang_instruction() -> str:
     if is_rtl():
         return "\n\nIMPORTANT: Generate ALL content (titles, descriptions, bullets, narrations, questions, answers, explanations) in Hebrew (עברית). Use right-to-left text naturally."
     return "\n\nGenerate all content in English."
+
+
+# ── Save / Load helpers ───────────────────────────────────────────────────────
+SAVE_KEYS = ['course', 'pdf_text', 'unit_content', 'exam_data',
+             'unit_prog', 'exam_results', 'exam_ans', 'language']
+
+def build_save_file() -> bytes:
+    """Serialize all course state to a JSON file."""
+    payload = {
+        'eduai_version': 2,
+        'saved_at': __import__('datetime').datetime.utcnow().isoformat(),
+        'data': {}
+    }
+    for k in SAVE_KEYS:
+        val = st.session_state.get(k)
+        # unit_prog keys are ints in session state but JSON requires str keys
+        if k == 'unit_prog' and val:
+            val = {str(i): v for i, v in val.items()}
+        payload['data'][k] = val
+    return json.dumps(payload, ensure_ascii=False, indent=2).encode('utf-8')
+
+def load_save_file(raw: bytes) -> tuple[bool, str]:
+    """Deserialize a save file back into session state. Returns (ok, message)."""
+    try:
+        payload = json.loads(raw.decode('utf-8'))
+        if payload.get('eduai_version') not in (1, 2):
+            return False, T('load_error')
+        data = payload.get('data', {})
+        for k in SAVE_KEYS:
+            if k not in data:
+                continue
+            val = data[k]
+            # Restore int keys for unit_prog
+            if k == 'unit_prog' and val:
+                val = {int(i): v for i, v in val.items()}
+            st.session_state[k] = val
+        st.session_state['page'] = 'dashboard'
+        st.session_state['cur_unit'] = 0
+        st.session_state['cur_exam'] = None
+        return True, T('load_success')
+    except Exception as e:
+        return False, f"{T('load_error')} ({e})"
 
 
 @st.cache_resource
@@ -830,6 +884,30 @@ def page_home():
                     <p style="color:#7a87a3;font-size:.82rem;line-height:1.5">{T(desc_key)}</p>
                 </div>""", unsafe_allow_html=True)
 
+        # ── Load saved course ──
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown(f"""
+        <div style="background:rgba(212,168,83,.05);border:1px dashed rgba(212,168,83,.25);border-radius:10px;padding:1.2rem 1.6rem;margin-top:.5rem">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:.5rem">
+                <span style="font-size:1.4rem">💾</span>
+                <span style="color:#d4a853;font-weight:600;font-size:.95rem">{T('load_course')}</span>
+            </div>
+            <p style="color:#7a87a3;font-size:.83rem;margin:0">{T('load_desc')}</p>
+        </div>""", unsafe_allow_html=True)
+
+        load_col1, load_col2, load_col3 = st.columns([1, 2, 1])
+        with load_col2:
+            save_file = st.file_uploader(
+                "", type=["json"], key="load_uploader", label_visibility="collapsed"
+            )
+            if save_file is not None:
+                ok, msg = load_save_file(save_file.read())
+                if ok:
+                    st.success(msg)
+                    st.rerun()
+                else:
+                    st.error(msg)
+
 
 def page_dashboard():
     course = st.session_state.course
@@ -881,6 +959,20 @@ def page_dashboard():
             for k in list(st.session_state.keys()):
                 del st.session_state[k]
             st.rerun()
+
+        # ── Save course ──
+        st.markdown("<hr>", unsafe_allow_html=True)
+        st.markdown(f"<p style='color:#7a87a3;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px'>{T('save_load_title')}</p>", unsafe_allow_html=True)
+        course_title_safe = course.get('title', 'course')[:30].replace(' ', '_')
+        save_bytes = build_save_file()
+        st.download_button(
+            label=f"💾 {T('save_course')}",
+            data=save_bytes,
+            file_name=f"eduai_{course_title_safe}.json",
+            mime="application/json",
+            use_container_width=True,
+            help=T('save_desc'),
+        )
 
     # Main
     st.markdown(f"""
@@ -947,6 +1039,10 @@ def page_unit():
     with st.sidebar:
         if st.button(T('back_dashboard')):
             st.session_state.page = 'dashboard'; st.rerun()
+        if st.button(T('new_course')):
+            for k in list(st.session_state.keys()):
+                del st.session_state[k]
+            st.rerun()
         st.markdown(f"<div style='padding:.8rem 0'><div style='color:#7a87a3;font-size:.7rem;text-transform:uppercase'>{T('pdf_unit_label')} {unit['unit_number']}</div><h3 style='font-family:\"Playfair Display\",serif;color:#d4a853;font-size:.95rem;margin-top:3px'>{unit['title']}</h3></div>", unsafe_allow_html=True)
         p = st.session_state.unit_prog[idx]
         for lbl, done in [(T('tab_lecture'), p['lecture']), (T('tab_practice'), p['practice']), (T('tab_summary'), p['summary'])]:
@@ -956,6 +1052,16 @@ def page_unit():
             if st.button(T('prev_unit')): st.session_state.cur_unit -= 1; st.rerun()
         if idx < 14:
             if st.button(T('next_unit')): st.session_state.cur_unit += 1; st.rerun()
+        st.markdown("<hr>", unsafe_allow_html=True)
+        course_title_safe = course.get('title', 'course')[:30].replace(' ', '_')
+        st.download_button(
+            label=f"💾 {T('save_course')}",
+            data=build_save_file(),
+            file_name=f"eduai_{course_title_safe}.json",
+            mime="application/json",
+            use_container_width=True,
+            help=T('save_desc'),
+        )
 
     # Header
     st.markdown(f"""
